@@ -3,7 +3,6 @@ from typing import List, Tuple
 
 FLAGS = flags.FLAGS
 
-flags.DEFINE_bool('run_tests', False, 'If true, run doctests')
 flags.DEFINE_string('input', '', 'Path to input file.')
 
 
@@ -27,6 +26,8 @@ def count_zeroes(movements: List[str]) -> Tuple[int, int]:
     """
     >>> count_zeroes(['L68', 'L30', 'R48', 'L5', 'R60', 'L55', 'L1', 'L99', 'R14', 'L82'])
     (3, 6)
+    >>> count_zeroes(['L50', 'R2', "L102"])
+    (2, 3)
     """
     zero_stops = 0
     zero_clicks = 0
@@ -57,11 +58,9 @@ def count_zeroes(movements: List[str]) -> Tuple[int, int]:
     return zero_stops, zero_clicks
 
 
-def main(argv):
-    if FLAGS.run_tests:
-        import doctest
-        doctest.testmod()
-        return
+def main(argv: List[str]) -> int:
+    import doctest
+    doctest.testmod(raise_on_error=True)
 
     if FLAGS.input != '':
         with open(FLAGS.input) as f:
@@ -69,6 +68,8 @@ def main(argv):
 
         response_one, response_two = count_zeroes(movements)
         print(f'Response: {response_one}, {response_two}')
+
+    return 0
 
 
 if __name__ == '__main__':
