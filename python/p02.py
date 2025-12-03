@@ -28,12 +28,11 @@ def solve_range(id_range: str) -> RangeResult:
         if match is None:
             continue
 
-        if match.group(3) is not None:
-            extended_total += i
-        else:
+        if match.group(3) is None:
             simple_total += i
+        extended_total += i
 
-    return RangeResult(simple_total, extended_total + simple_total)
+    return RangeResult(simple_total, extended_total)
 
 
 def main(argv: List[str]) -> int:
