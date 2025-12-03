@@ -1,20 +1,15 @@
 import re
 from typing import List
-from collections import namedtuple
 
-from absl import flags, app
+from answer import Answer
 
-FLAGS = flags.FLAGS
-flags.DEFINE_string('input', '', 'Path to input file.')
 
-RangeResult = namedtuple('Result', ['simple_rule', 'extended_rules'])
-
-def solve_range(id_range: str) -> RangeResult:
+def solve_range(id_range: str) -> Answer:
     """
     >>> solve_range('998-1012')
-    Result(simple_rule=1010, extended_rules=2009)
+    Answer(part_one=1010, part_two=2009)
     >>> solve_range('1188511880-1188511890')
-    Result(simple_rule=1188511885, extended_rules=1188511885)
+    Answer(part_one=1188511885, part_two=1188511885)
     """
     assert id_range.count('-') == 1
     lower_bound, upper_bound = [int(x) for x in id_range.split('-')]
@@ -32,26 +27,14 @@ def solve_range(id_range: str) -> RangeResult:
             simple_total += i
         extended_total += i
 
-    return RangeResult(simple_total, extended_total)
+    return Answer(simple_total, extended_total)
 
 
-def main(argv: List[str]) -> int:
-    import doctest
-    doctest.testmod()
+def solve(lines: List[str]):
+    assert len(lines) == 1
+    result = Answer(0, 0)
 
-    if FLAGS.input != '':
-        total = 0
-        extended_total = 0
-        with open(FLAGS.input) as f:
-            data = f.readline().strip()
-            for id_range in data.split(','):
-                result = solve_range(id_range)
-                total += result.simple_rule
-                extended_total += result.extended_rules
-        print(
-            f'Results: {total}, {extended_total}')
-    return 0
+    for id_range in lines[0].split(','):
+        result += solve_range(id_range)
 
-
-if __name__ == '__main__':
-    app.run(main)
+    return result

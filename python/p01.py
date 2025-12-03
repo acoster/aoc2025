@@ -1,9 +1,6 @@
-from absl import flags, app
-from typing import List, Tuple
+from typing import List
 
-FLAGS = flags.FLAGS
-
-flags.DEFINE_string('input', '', 'Path to input file.')
+from answer import Answer
 
 
 def parse_movement(movement: str) -> int:
@@ -22,18 +19,18 @@ def parse_movement(movement: str) -> int:
     return int(movement[1:])
 
 
-def count_zeroes(movements: List[str]) -> Tuple[int, int]:
+def solve(lines: List[str]) -> Answer:
     """
-    >>> count_zeroes(['L68', 'L30', 'R48', 'L5', 'R60', 'L55', 'L1', 'L99', 'R14', 'L82'])
-    (3, 6)
-    >>> count_zeroes(['L50', 'R2', "L102"])
-    (2, 3)
+    >>> solve(['L68', 'L30', 'R48', 'L5', 'R60', 'L55', 'L1', 'L99', 'R14', 'L82'])
+    Answer(part_one=3, part_two=6)
+    >>> solve(['L50', 'R2', "L102"])
+    Answer(part_one=2, part_two=3)
     """
     zero_stops = 0
     zero_clicks = 0
     position = 50
 
-    for move in movements:
+    for move in lines:
         delta = parse_movement(move)
 
         if abs(delta) >= 100:
@@ -55,22 +52,4 @@ def count_zeroes(movements: List[str]) -> Tuple[int, int]:
         if position == 0:
             zero_stops += 1
 
-    return zero_stops, zero_clicks
-
-
-def main(argv: List[str]) -> int:
-    import doctest
-    doctest.testmod(raise_on_error=True)
-
-    if FLAGS.input != '':
-        with open(FLAGS.input) as f:
-            movements = [l.strip() for l in f.readlines()]
-
-        response_one, response_two = count_zeroes(movements)
-        print(f'Response: {response_one}, {response_two}')
-
-    return 0
-
-
-if __name__ == '__main__':
-    app.run(main)
+    return Answer(zero_stops, zero_clicks)

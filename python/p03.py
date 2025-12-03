@@ -1,9 +1,6 @@
 from typing import List
 
-from absl import flags, app
-
-FLAGS = flags.FLAGS
-flags.DEFINE_string('input', '', 'Path to input file.')
+from answer import Answer
 
 
 def find_joltage(bank: str, num_digits: int) -> int:
@@ -35,21 +32,11 @@ def find_joltage(bank: str, num_digits: int) -> int:
     return result
 
 
-def main(argv: List[str]) -> int:
-    import doctest
-    doctest.testmod()
+def solve(lines: List[str]):
+    result = Answer(0, 0)
 
-    if FLAGS.input != '':
-        with open(FLAGS.input) as f:
-            total_one = 0
-            total_two = 0
+    for line in lines:
+        result += Answer(find_joltage(line, 2),
+                         find_joltage(line, 12))
 
-            for line in f.readlines():
-                line = line.strip()
-                total_one += find_joltage(line, 2)
-                total_two += find_joltage(line, 12)
-
-            print(f'{total_one}, {total_two}')
-
-if __name__ == '__main__':
-    app.run(main)
+    return result
