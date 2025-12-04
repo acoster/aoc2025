@@ -1,5 +1,5 @@
-from typing import List
 from collections import defaultdict
+from typing import List
 
 from answer import Answer
 from utils import Coord, Directions
@@ -18,27 +18,39 @@ def _test_input():
 @.@.@@@.@.'''
     return [l.strip() for l in s.split('\n')]
 
-class Grid:
-    def __init__(self, width:int, height:int):
-        self.width = width
-        self.height = height
-        self.neighbour_count  = defaultdict(int)
-        self.rolls = set()
 
+class Grid:
+    def __init__(self):
+        self.neighbour_count = defaultdict(int)
+        self.rolls = set()
 
     def add_roll(self, coord: Coord):
         self.rolls.add(coord)
         for direction in Directions:
             self.neighbour_count[coord + direction.value] += 1
 
+    def new_generation(self) -> int:
+        previous_rolls = self.rolls.copy()
+        previous_count = self.neighbour_count.copy()
+        self.neighbour_count = defaultdict(int)
+        self.rolls = set()
+
+        removed = 0
+        for coord in previous_rolls:
+            if previous_count[coord] < 4:
+                removed += 1
+            else:
+                self.add_roll(coord)
+
+        return removed
 
 
 def solve(lines: List[str]) -> Answer:
     """
     >>> solve(_test_input())
-    Answer(part_one=13, part_two=None)
+    Answer(part_one=13, part_two=43)
     """
-    grid = Grid(len(lines[0]), len(lines))
+    grid = Grid()
 
     for y in range(len(lines)):
         row = lines[y]
@@ -46,10 +58,12 @@ def solve(lines: List[str]) -> Answer:
             if row[x] == '@':
                 grid.add_roll(Coord(x, y))
 
+    part_one = grid.new_generation()
+    part_two = part_one
+    while True:
+        removed = grid.new_generation()
+        if removed == 0:
+            break
+        part_two += removed
 
-    part_one = 0
-    for r in grid.rolls:
-        if grid.neighbour_count[r] < 4:
-            part_one += 1
-
-    return Answer(part_one, None)
+    return Answer(part_one, part_two)
