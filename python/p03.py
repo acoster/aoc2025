@@ -32,7 +32,7 @@ def find_joltage(bank: str, num_digits: int) -> int:
     return result
 
 
-def solve(lines: List[str]):
+def solve(lines: List[str]) -> Answer:
     result = Answer(0, 0)
 
     for line in lines:
