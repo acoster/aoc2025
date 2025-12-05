@@ -1,6 +1,6 @@
 from typing import List
 
-import portion as P
+import portion
 
 from answer import Answer
 
@@ -9,14 +9,14 @@ def solve(lines: List[str]) -> Answer:
     i = 0
     valid_ids = 0
 
-    ranges = P.empty()
+    ranges = portion.empty()
 
     while i < len(lines):
         if '-' not in lines[i]:
             i += 1
             break
         a, b = [int(x) for x in lines[i].split('-')]
-        ranges = ranges | P.closed(a, b)
+        ranges = ranges | portion.closed(a, b)
         i += 1
 
     total_valid_ids = 0
