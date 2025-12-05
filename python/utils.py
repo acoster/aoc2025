@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
 
-
 @dataclass(eq=True, frozen=True, match_args=True, kw_only=True)
 class Coord:
     """2D coordinates."""
@@ -23,33 +22,6 @@ class Coord:
         if self.x != other.x:
             return self.x < other.x
         return self.y <= other.y
-
-@dataclass(eq=True, frozen=True, match_args=True)
-class Interval:
-    a: int
-    b: int
-
-    def __init__(self, a: int, b: int):
-        assert a <= b
-        object.__setattr__(self, 'a', a)
-        object.__setattr__(self, 'b', b)
-
-    def __contains__(self, other: int):
-        """
-        >>> 3 in Interval(3, 4)
-        True
-        """
-        return self.a <= other <= self.b
-
-    def __lt__(self, other):
-        if self.a != other.a:
-            return self.a < other.a
-        return self.b < other.b
-
-    def __le__(self, other):
-        if self.a != other.a:
-            return self.a < other.a
-        return self.b <= other.b
 
 class Directions(Enum):
     NW = Coord(x=-1, y=-1)
