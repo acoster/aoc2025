@@ -56,7 +56,7 @@ def solve(lines: List[str]) -> Answer:
         row = lines[y]
         for x in range(len(row)):
             if row[x] == '@':
-                grid.add_roll(Coord(x, y))
+                grid.add_roll(Coord(x=x, y=y))
 
     part_one = grid.new_generation()
     part_two = part_one
