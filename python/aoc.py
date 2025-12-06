@@ -28,7 +28,10 @@ def main(argv) -> int:
     if FLAGS.input != '':
         try:
             with open(FLAGS.input) as f:
-                lines = [l.strip() for l in f.readlines()]
+                if 'DONT_STRIP_LINES' in dir(p):
+                    lines = f.read().splitlines()
+                else:
+                    lines = [l.strip() for l in f.readlines()]
 
             start = time.perf_counter()
             result = p.solve(lines)
