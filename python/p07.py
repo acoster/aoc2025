@@ -8,7 +8,6 @@ from utils import Coord, search_in_column
 
 def solve(lines: List[str]) -> Answer:
     width = len(lines[0])
-    height = len(lines)
     visited: Set[Coord] = set()
 
     # Maps X coordinate of escaped beam to splitters that sourced it

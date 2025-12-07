@@ -1,33 +1,32 @@
+import argparse
+import doctest
 import importlib
 import time
+from sys import exit
 
-from absl import flags, app
 from si_prefix import si_format
 
-FLAGS = flags.FLAGS
-flags.DEFINE_string('input', '', 'Path to input file.')
-flags.DEFINE_string('problem', '', 'Problem library (e.g. p01)')
-
-
-def main(argv) -> int:
-    if len(FLAGS.problem) == 0:
-        print('--problem is required')
-        return 1
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', type=str, default='')
+    parser.add_argument('--problem', '-p', type=str, default='', required=True)
+    ns = parser.parse_args()
 
     try:
-        p = importlib.import_module(FLAGS.problem, package=__package__)
-    except ImportError:
-        print(f'Failed to import {FLAGS.problem}')
-        return 1
+        p = importlib.import_module(ns.problem, package=__package__)
+    except ImportError as e:
+        print(f'Failed to import {ns.problem}')
+        exit(1)
 
-    assert 'solve' in dir(p)
+    if 'solve' not in dir(p):
+        print(f'{ns.problem} does not define a solve function')
+        exit(1)
 
-    import doctest
     doctest.testmod(p)
 
-    if FLAGS.input != '':
+    if ns.input != '':
         try:
-            with open(FLAGS.input) as f:
+            with open(ns.input) as f:
                 if 'DONT_STRIP_LINES' in dir(p):
                     lines = f.read().splitlines()
                 else:
@@ -39,12 +38,6 @@ def main(argv) -> int:
 
             print(f'{result}')
             print(f'Runtime: {si_format(runtime, 2)}s')
-        except IOError:
-            print(f'Failed to open {FLAGS.input}')
-            return 1
-
-    return 0
-
-
-if __name__ == '__main__':
-    app.run(main)
+        except IOError as e:
+            print(f'Failed to open {ns.input}: {e.strerror}')
+            exit(1)
