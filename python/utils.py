@@ -1,5 +1,9 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import TypeVar, Sequence
+
+T = TypeVar('T')
+
 
 @dataclass(eq=True, frozen=True, match_args=True, kw_only=True)
 class Coord:
@@ -23,6 +27,7 @@ class Coord:
             return self.x < other.x
         return self.y <= other.y
 
+
 class Directions(Enum):
     NW = Coord(x=-1, y=-1)
     N = Coord(x=0, y=-1)
@@ -33,6 +38,24 @@ class Directions(Enum):
     SW = Coord(x=-1, y=1)
     W = Coord(x=-1, y=0)
 
+
+def search_in_column(matrix: Sequence[Sequence[T]], column: int, needle: T, /, start_y: int = 0) -> int:
+    """
+    >>> search_in_column([[1, 2, 3], [4, 5, 6]], 1, 5)
+    1
+    >>> search_in_column([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 1, 5, start_y=2)
+    -1
+    """
+    if not 0 <= column < len(matrix[0]):
+        raise IndexError(f'Column index {column} out of range')
+    height = len(matrix[0])
+    if not 0 <= start_y < height:
+        raise IndexError(f'Y position {start_y} out of range')
+
+    return next((y for y in range(start_y, height) if matrix[y][column] == needle), -1)
+
+
 if __name__ == '__main__':
     import doctest
+
     doctest.testmod()

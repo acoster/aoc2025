@@ -1,14 +1,19 @@
-from typing import List
+from collections import defaultdict
+from functools import cache
+from typing import List, Dict, Set
 
 from answer import Answer
-from utils import Coord
+from utils import Coord, search_in_column
 
 
 def solve(lines: List[str]) -> Answer:
     width = len(lines[0])
     height = len(lines)
-    visited = set()
+    visited: Set[Coord] = set()
 
+    # Maps X coordinate of escaped beam to splitters that sourced it
+    escaped_sources: Dict[int, List[Coord]] = defaultdict(list)
+    splitter_sources: Dict[Coord, List[Coord]] = defaultdict(list)
 
     src = lines[0].find('S')
     assert src != -1
@@ -26,13 +31,32 @@ def solve(lines: List[str]) -> Answer:
         splits += 1
 
         if coord.x > 0:
-            left_splitter = ''.join(lines[y][coord.x - 1] for y in range(coord.y, height)).find('^')
-            if left_splitter != -1:
-                to_visit.append(Coord(x=coord.x - 1, y=coord.y + left_splitter))
+            pos = search_in_column(lines, coord.x - 1, '^', start_y=coord.y)
+            if pos == -1:
+                escaped_sources[coord.x - 1].append(coord)
+            else:
+                left_splitter = Coord(x=coord.x - 1, y=pos)
+                to_visit.append(left_splitter)
+                splitter_sources[left_splitter].append(coord)
 
         if coord.x < width - 1:
-            right_splitter = ''.join(lines[y][coord.x + 1] for y in range(coord.y, height)).find('^')
-            if right_splitter != -1:
-                to_visit.append(Coord(x=coord.x + 1, y=coord.y + right_splitter))
+            pos = search_in_column(lines, coord.x + 1, '^', start_y=coord.y)
+            if pos == -1:
+                escaped_sources[coord.x + 1].append(coord)
+            else:
+                right_splitter = Coord(x=coord.x + 1, y=pos)
+                to_visit.append(right_splitter)
+                splitter_sources[right_splitter].append(coord)
 
-    return Answer(splits, None)
+    @cache
+    def count_timelines(c: Coord):
+        if c not in splitter_sources:
+            return 1
+        return sum([count_timelines(s) for s in splitter_sources[c]])
+
+    timelines = 0
+    for x, sources in escaped_sources.items():
+        for splitter in sources:
+            timelines += count_timelines(splitter)
+
+    return Answer(splits, timelines)
