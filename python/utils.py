@@ -46,12 +46,7 @@ def search_in_column(matrix: Sequence[Sequence[T]], column: int, needle: T, /, s
     >>> search_in_column([[1, 2, 3], [4, 5, 6], [7, 8, 9]], 1, 5, start_y=2)
     -1
     """
-    if not 0 <= column < len(matrix[0]):
-        raise IndexError(f'Column index {column} out of range')
     height = len(matrix[0])
-    if not 0 <= start_y < height:
-        raise IndexError(f'Y position {start_y} out of range')
-
     return next((y for y in range(start_y, height) if matrix[y][column] == needle), -1)
 
 

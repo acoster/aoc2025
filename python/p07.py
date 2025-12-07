@@ -18,12 +18,11 @@ def solve(lines: List[str]) -> Answer:
     src = lines[0].find('S')
     assert src != -1
 
-    first_splitter = ''.join(lines[y][src] for y in range(height)).find('^')
-    assert first_splitter != -1
+    first_splitter = search_in_column(lines, src, '^')
 
     splits = 0
     to_visit = [Coord(x=src, y=first_splitter)]
-    while len(to_visit) > 0:
+    while to_visit:
         coord = to_visit.pop()
         if coord in visited:
             continue
