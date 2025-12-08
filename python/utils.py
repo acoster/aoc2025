@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from typing import TypeVar, Sequence
+import math
 
 T = TypeVar('T')
 
@@ -27,6 +28,31 @@ class Coord:
             return self.x < other.x
         return self.y <= other.y
 
+@dataclass(eq=True, frozen=True, match_args=True, kw_only=True)
+class Coord3D:
+    """3D coordinates."""
+    x: int
+    y: int
+    z: int
+
+    def __lt__(self, other):
+        if self.x != other.x:
+            return self.x < other.x
+        if self.y != other.y:
+            return self.y < other.y
+        return self.z < other.z
+
+
+    def __le__(self, other):
+        if self.x != other.x:
+            return self.x < other.x
+        if self.y != other.y:
+            return self.y < other.y
+        return self.z <= other.z
+
+    @staticmethod
+    def distance(a: 'Coord3D', b: 'Coord3D') -> float:
+        return math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2)
 
 class Directions(Enum):
     NW = Coord(x=-1, y=-1)
