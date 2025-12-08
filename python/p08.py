@@ -33,9 +33,10 @@ def solve(lines: List[str]) -> Answer:
                               b=idx_b))
 
     distances.sort(key=lambda x: x.distance)
-
     connections = 0
-    for o in distances:
+    o = distances[0]
+    while distances:
+        o = distances.pop(0)
         if not g.are_connected(o.a, o.b):
             g.add_edge(o.a, o.b)
             connections += 1
@@ -44,5 +45,12 @@ def solve(lines: List[str]) -> Answer:
 
     component_sizes = g.components().sizes()
     component_sizes.sort(reverse=True)
+    part_one = reduce(operator.mul, component_sizes[:3], 1)
 
-    return Answer(reduce(operator.mul, component_sizes[:3], 1), None)
+    while not g.is_connected():
+        o = distances.pop(0)
+        if not g.are_connected(o.a, o.b):
+            g.add_edge(o.a, o.b)
+
+
+    return Answer(part_one, coords[o.a].x * coords[o.b].x)
