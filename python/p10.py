@@ -5,7 +5,7 @@ import z3
 from answer import Answer
 
 
-def solve_instance(lights: List[bool], buttons: List[List[int]]) -> int:
+def solve_part_one(lights: List[bool], buttons: List[List[int]]) -> int:
     s = z3.Optimize()
 
     switches = [z3.Bool('button_%d' % (i,)) for i in range(len(buttons))]
@@ -23,21 +23,50 @@ def solve_instance(lights: List[bool], buttons: List[List[int]]) -> int:
     if s.check() == z3.sat:
         m = s.model()
         return sum([1 for b in switches if z3.is_true(m[b])])
-    return -1000
+    raise Exception("No solution")
+
+
+def solve_part_two(buttons: List[List[int]], targets : List[int]) -> int:
+    s = z3.Optimize()
+
+    switches = [z3.Int('btn_%d' % (i,)) for i in range(len(buttons))]
+    for switch in switches:
+        s.add(switch >= 0)
+    for idx, target in enumerate(targets):
+        connected_switches = [switches[i] for i in range(len(switches)) if
+                              idx in buttons[i]]
+        v = z3.Sum(connected_switches)
+        s.add(v == target)
+
+    press_count = z3.Sum(switches)
+    s.minimize(press_count)
+
+    if s.check() == z3.sat:
+        m = s.model()
+        return sum([m[b].as_long() for b in switches])
+
+    raise Exception("No solution")
 
 
 def solve(lines: List[str]) -> Answer:
     p0 = 0
+    p1 = 0
 
     for l in lines:
         lights = []
         buttons = []
+        targets = []
+
         for e in [x.strip() for x in  l.split()]:
             if e.startswith('['):
                 lights = [c == '#' for c in e[1:-1]]
             if e.startswith('('):
                 buttons.append([int(x) for x in e[1:-1].split(',')])
-        p0 += solve_instance(lights, buttons)
+            if e.startswith('{'):
+                targets = [int(x) for x in e[1:-1].split(',')]
+
+        p0 += solve_part_one(lights, buttons)
+        p1 += solve_part_two(buttons, targets)
 
 
-    return Answer(p0, 0)
+    return Answer(p0, p1)
