@@ -23,9 +23,12 @@ def solve(lines: List[str]) -> Answer:
             G[src].add(c)
 
     p0 = count_paths('you', 'out')
-    p1 = (count_paths('svr', 'fft') * count_paths('fft', 'dac') *
-          count_paths('dac', 'out'))
-    p1 += (count_paths('svr', 'dac') * count_paths('dac', 'fft') *
-           count_paths('fft', 'out'))
+
+    p1 = count_paths('fft', 'dac')
+    if p1 != 0:
+        p1 *= count_paths('svr', 'fft') * count_paths('dac', 'out')
+    else:
+        p1 = (count_paths('svr', 'dac') * count_paths('dac', 'fft') *
+               count_paths('fft', 'out'))
 
     return Answer(p0, p1)
