@@ -1,24 +1,31 @@
-from answer import Answer
+from collections import defaultdict
+from functools import cache
 from typing import List
 
-import igraph as ig
+from answer import Answer
+
+G = defaultdict(set)
+
+
+@cache
+def count_paths(src: str, dst: str) -> int:
+    if src == dst:
+        return 0
+    if dst in G[src]:
+        return 1
+    return sum((count_paths(h, dst) for h in G[src]))
+
 
 def solve(lines: List[str]) -> Answer:
-    graph = ig.Graph(directed=True)
-    name_to_id = {}
-    id_to_connections = {}
-
-    for idx, l in enumerate(lines):
+    for l in lines:
         src, connections = l.split(': ')
-        name_to_id[src] = idx
-        id_to_connections[idx] = connections.split()
-    name_to_id['out'] = len(name_to_id)
+        for c in connections.split():
+            G[src].add(c)
 
-    graph.add_vertices(len(name_to_id))
-    for src, targets in id_to_connections.items():
-        for target in targets:
-            graph.add_edge(src, name_to_id[target])
+    p0 = count_paths('you', 'out')
+    p1 = (count_paths('svr', 'fft') * count_paths('fft', 'dac') *
+          count_paths('dac', 'out'))
+    p1 += (count_paths('svr', 'dac') * count_paths('dac', 'fft') *
+           count_paths('fft', 'out'))
 
-    all_paths = graph.get_all_simple_paths(v=name_to_id['you'], to=name_to_id['out'])
-
-    return Answer(len(all_paths), 0)
+    return Answer(p0, p1)
